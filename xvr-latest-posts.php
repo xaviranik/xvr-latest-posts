@@ -14,6 +14,7 @@
  * Text Domain:       xvr-latest-posts
  */
 
+use XVR\Latest_Post\Admin_Handler;
 use XVR\Latest_Post\Installer;
 
 if (!defined('ABSPATH')) exit;
@@ -40,6 +41,7 @@ final class XVR_Latest_Post {
         register_activation_hook( __FILE__, [ $this, 'activate' ] );
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
+        add_action('admin_enqueue_scripts', [$this, 'enqueue']);
     }
 
     /**
@@ -70,7 +72,9 @@ final class XVR_Latest_Post {
      * @return void
      */
     public function init_plugin() {
-        
+        if ( is_admin() ) {
+            new Admin_Handler;
+        }
     }
 
     /**
@@ -80,6 +84,15 @@ final class XVR_Latest_Post {
     public function activate() {
         $installer = new Installer;
         $installer->run();
+    }
+
+    /**
+     * Enqueues styles/scripts
+     *
+     * @return void
+     */
+    public function enqueue() {
+        wp_enqueue_style('xvr-latest-posts-style', plugins_url('/assets/css/main.css', __FILE__));
     }
 }
 
